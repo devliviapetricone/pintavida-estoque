@@ -50,9 +50,9 @@ ESTRUTURA DO PROJETO:
   ├── frontend/         → Site HTML/CSS/JS
   └── banco-de-dados/   → Script SQL para phpMyAdmin
 
-=======================================================
-  PASSO A PASSO PARA CONFIGURAR
-=======================================================
+
+ # PASSO A PASSO PARA CONFIGURAR
+
 
 --- 1. BANCO DE DADOS (phpMyAdmin) ---
 
@@ -95,9 +95,9 @@ b) O site vai conectar automaticamente ao Spring Boot
    Se a API estiver rodando, aparecerá "🟢 API conectada"
    Se não estiver: "🔴 Spring Boot offline"
 
-=======================================================
-  FUNCIONALIDADES DO SISTEMA
-=======================================================
+
+# FUNCIONALIDADES DO SISTEMA
+
 
 ✅ Ver todos os produtos do banco em tempo real
 ✅ Filtrar por categoria (Pintura, Cadernos, etc.)
@@ -110,17 +110,16 @@ b) O site vai conectar automaticamente ao Spring Boot
 ✅ Imagens por categoria via Unsplash
 ✅ Alertas de estoque baixo (≤10 unidades)
 
-=======================================================
-  POSSÍVEL PROBLEMA: CORS
-=======================================================
+
+# POSSÍVEL PROBLEMA: CORS
+
 Se o navegador bloquear as requisições, o CorsConfig.java
 já está configurado no backend para aceitar chamadas do
 frontend. Certifique-se de que o backend foi reiniciado
 após qualquer alteração.
 
-=======================================================
-  TECNOLOGIAS UTILIZADAS
-=======================================================
+# TECNOLOGIAS UTILIZADAS
+
   Frontend : HTML5 / CSS3 / JavaScript (Vanilla)
   Backend  : Java 17 + Spring Boot 3.3 + JPA
   Banco    : MySQL (phpMyAdmin / XAMPP)
