@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PintaVida — Sistema de Estoque</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<style>
+:root{--azul:#1565C0;--azul-claro:#1E88E5;--azul-bg:#E3F2FD;--vermelho:#C62828;--vermelho-claro:#E53935;--vermelho-bg:#FFEBEE;--amarelo:#F9A825;--amarelo-claro:#FDD835;--amarelo-bg:#FFFDE7;--laranja:#E65100;--laranja-claro:#FB8C00;--laranja-bg:#FFF3E0;--cinza-claro:#F5F5F5;--cinza:#757575;--escuro:#1A1A2E;--fd:'Baloo 2',cursive;--fb:'Nunito',sans-serif;--r:16px;--sh:0 4px 20px rgba(0,0,0,.10);--shh:0 8px 32px rgba(0,0,0,.18)}
+</style>
+
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">✏️</div>
+      <div><div class="logo-text">PintaVida</div><div class="logo-sub">Papelaria</div></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#estoque">Estoque</a></li>
+      <li><a href="#cadastro">Cadastrar</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div class="spill checking" id="spill">
+        <span class="sdot pulse"></span><span id="stxt">Conectando...</span>
+      </div>
+      <button class="btn-nav-add" onclick="abrirModal()">➕ Novo Produto</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hs"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge"><span class="bdot"></span>Sistema Interno · Funcionários e Gerentes</div>
+      <h1>Gerencie o estoque da <span class="d">PintaVida!</span></h1>
+      <p>Cadastre, edite e controle todos os produtos em tempo real. Dados salvos diretamente no MySQL via Spring Boot.</p>
+      <div class="hero-ctas">
+        <button class="btn-hero bh1" onclick="document.getElementById('estoque').scrollIntoView({behavior:'smooth'})">📦 Ver Estoque</button>
+        <button class="btn-hero bh2" onclick="abrirModal()">➕ Cadastrar Produto</button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="hcard hc1"><div class="hcard-icon">🎨</div><div class="hcard-label">Arte e Pintura</div></div>
+      <div class="hcard hc2"><div class="hcard-icon">📓</div><div class="hcard-label">Cadernos</div></div>
+      <div class="hcard hc3"><div class="hcard-icon">✏️</div><div class="hcard-label">Lápis e Canetas</div></div>
+      <div class="hcard hc4"><div class="hcard-icon">🎒</div><div class="hcard-label">Material Escolar</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><span class="stat-num" id="st-total">—</span><span class="stat-label">Total de Produtos</span></div>
+    <div class="stat-item sl"><span class="stat-num" id="st-valor">—</span><span class="stat-label">Valor em Estoque</span></div>
+    <div class="stat-item sr"><span class="stat-num" id="st-baixo">—</span><span class="stat-label">Estoque Baixo</span></div>
+    <div class="stat-item sv"><span class="stat-num" id="st-cats">—</span><span class="stat-label">Categorias</span></div>
+  </div>
+</div>
+
+<section class="section produtos" id="estoque">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="stag to">Banco de Dados em Tempo Real</div>
+      <h2>Controle de Estoque</h2>
+      <p class="sub">Dados carregados direto do MySQL via Spring Boot · <strong>GET /papelaria</strong></p>
+    </div>
+    <div class="toolbar">
+      <div class="ts-wrap">
+        <input type="text" id="sinput" class="sinput" placeholder="Buscar por marca...">
+        <button class="bbuscar" onclick="buscarMarca()">🔍 Buscar</button>
+        <button class="blimpar" onclick="limparBusca()">✕ Limpar</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <button class="fbtn active" onclick="filtrar(this,'')">Todos</button>
+      <button class="fbtn" onclick="filtrar(this,'Pintura')">🎨 Pintura</button>
+      <button class="fbtn" onclick="filtrar(this,'Cadernos')">📓 Cadernos</button>
+      <button class="fbtn" onclick="filtrar(this,'Lápis e Canetas')">✏️ Lápis e Canetas</button>
+      <button class="fbtn" onclick="filtrar(this,'Escolar')">🎒 Escolar</button>
+      <button class="fbtn" onclick="filtrar(this,'Outros')">📦 Outros</button>
+    </div>
+    <div class="pgrid" id="pgrid">
+      <div class="lstate"><div class="spinner"></div><p>Carregando produtos do banco...</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="banner-cad" id="cadastro">
+  <div class="binner">
+    <div class="btext">
+      <h3>📦 Adicionar novo produto</h3>
+      <p>Cadastre produtos novos diretamente no banco de dados MySQL</p>
+    </div>
+    <button class="bbanner" onclick="abrirModal()">➕ Cadastrar Produto</button>
+  </div>
+</div>
+
+<div class="dif-s" id="sobre">
+  <div class="dgrid">
+    <div class="ditem"><span class="dicon">⚡</span><h4>Tempo Real</h4><p>Dados sincronizados automaticamente com o MySQL</p></div>
+    <div class="ditem"><span class="dicon">🔍</span><h4>Busca por Marca</h4><p>Encontre produtos filtrando pela marca rapidamente</p></div>
+    <div class="ditem"><span class="dicon">✏️</span><h4>Edição Rápida</h4><p>Atualize qualquer campo do produto em segundos</p></div>
+    <div class="ditem"><span class="dicon">🗑️</span><h4>Exclusão Segura</h4><p>Confirmação antes de remover qualquer produto</p></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="fgrid">
+      <div class="fbrand">
+        <a href="#" class="flogo">
+          <div class="fli">✏️</div>
+          <div><div class="logo-text" style="color:#fff">PintaVida</div><div class="logo-sub">Papelaria</div></div>
+        </a>
+        <p class="fdesc">Sistema interno de controle de estoque. Uso exclusivo de funcionários e gerentes.</p>
+        <div class="fsoc"><button class="sbtn">📘</button><button class="sbtn">📸</button><button class="sbtn">💬</button></div>
+      </div>
+      <div class="fcol"><h5>Sistema</h5><ul><li><a href="#estoque">Ver Estoque</a></li><li><a href="#" onclick="abrirModal()">Novo Produto</a></li></ul></div>
+      <div class="fcol"><h5>Categorias</h5><ul><li><a href="#">Pintura</a></li><li><a href="#">Cadernos</a></li><li><a href="#">Escolar</a></li></ul></div>
+      <div class="fcol"><h5>Suporte TI</h5><ul><li><a href="#">Manual</a></li><li><a href="#">API: porta 8080</a></li></ul></div>
+    </div>
+    <div class="fbot">
+      <p>© 2025 PintaVida Papelaria · Sistema Interno · API: localhost:8080</p>
+      <div class="tbadges"><div class="tbadge">Spring Boot 3.3</div><div class="tbadge">MySQL</div><div class="tbadge">JPA</div></div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL CADASTRO / EDIÇÃO -->
+<div class="modal-overlay" id="moverlay">
+  <div class="modal">
+    <div class="mhead"><h3 id="mtitle">➕ Novo Produto</h3><button class="mclose" onclick="fecharModal()">✕</button></div>
+    <input type="hidden" id="eid">
+    <div class="fgrid2">
+      <div class="fg full"><label>Nome do Produto *</label><input type="text" id="fnome" placeholder="Ex: Lápis de cor 24 cores"></div>
+      <div class="fg"><label>Marca *</label><input type="text" id="fmarca" placeholder="Ex: Faber-Castell"></div>
+      <div class="fg"><label>Categoria *</label>
+        <select id="fcat"><option value="">Selecione...</option><option>Pintura</option><option>Cadernos</option><option>Lápis e Canetas</option><option>Escolar</option><option>Outros</option></select>
+      </div>
+      <div class="fg"><label>Preço (R$) *</label><input type="number" id="fpreco" placeholder="0,00" step="0.01" min="0"></div>
+      <div class="fg"><label>Quantidade *</label><input type="number" id="fqtd" placeholder="0" min="0"></div>
+    </div>
+    <div class="mactions">
+      <button class="mcancel" onclick="fecharModal()">Cancelar</button>
+      <button class="msave" id="msave" onclick="salvar()">💾 Salvar no Banco</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR DELETE -->
+<div class="modal-overlay" id="coverlay">
+  <div class="conf-modal">
+    <span class="cicon">🗑️</span>
+    <h3>Confirmar exclusão</h3>
+    <p id="cmsg">Tem certeza?</p>
+    <div class="cactions">
+      <button class="ccancel" onclick="fecharConf()">Cancelar</button>
+      <button class="cdelete" id="cbtn">Sim, excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tmsg"></span></div>
+
+<script>
+// ====================================================
+// ENDPOINTS — mapeados exatamente como no Controller
+// ====================================================
+const BASE = 'http://localhost:8080';
+
+const EP = {
+  listar:    `${BASE}/papelaria`,                   // GET  /papelaria
+  cadastrar: `${BASE}/papelaria/cadastrarproduto`,  // POST /papelaria/cadastrarproduto
+  atualizar: `${BASE}/papelaria`,                   // PUT  /papelaria
+  deletar:   (id) => `${BASE}/papelaria/${id}`,     // DELETE /papelaria/{id}
+  marca:     (m)  => `${BASE}/papelaria/marca/${encodeURIComponent(m)}` // GET /papelaria/marca/{marca}
+};
+
+const EMOJI = {'Pintura':'🎨','Cadernos':'📓','Lápis e Canetas':'✏️','Escolar':'🎒','Outros':'📦'};
+const COR   = {'Pintura':'#E3F2FD','Cadernos':'#FFFDE7','Lápis e Canetas':'#FFF3E0','Escolar':'#FFEBEE','Outros':'#F3E5F5'};
+const IMG   = {
+  'Pintura':        'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&q=80',
+  'Cadernos':       'https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400&q=80',
+  'Lápis e Canetas':'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&q=80',
+  'Escolar':        'https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?w=400&q=80',
+  'Outros':         'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80'
+};
+
+let todos=[], filtroAtivo='', modoEdit=false, delId=null;
+
+// ---- STATUS DA API ----
+async function checarApi(){
+  try{
+    const r = await fetch(EP.listar, {signal:AbortSignal.timeout(4000)});
+    r.ok ? setStatus('online','🟢 API conectada') : setStatus('offline','⚠️ Erro na API');
+  }catch{ setStatus('offline','🔴 Spring Boot offline'); }
+}
+function setStatus(c,t){
+  const p=document.getElementById('spill');
+  p.className='spill '+c;
+  p.innerHTML=`<span class="sdot${c==='online'?' pulse':''}"></span><span>${t}</span>`;
+}
+
+// ---- GET /papelaria ----
+async function carregarProdutos(){
+  document.getElementById('pgrid').innerHTML='<div class="lstate"><div class="spinner"></div><p>Carregando do banco...</p></div>';
+  try{
+    const r = await fetch(EP.listar);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    todos = await r.json();
+    atualizarStats();
+    renderizar(filtroAtivo);
+  }catch{
+    document.getElementById('pgrid').innerHTML=`
+      <div class="estate">
+        <span class="eicon">⚠️</span>
+        <p style="font-weight:700;margin-bottom:8px">Não foi possível conectar à API</p>
+        <p>Certifique-se que o Spring Boot está rodando em <strong>localhost:8080</strong></p>
+        <p style="font-size:.8rem;margin-top:10px;color:#bbb">Endpoint: GET /papelaria</p>
+      </div>`;
+  }
+}
+
+// ---- GET /papelaria/marca/{marca} ----
+async function buscarMarca(){
+  const m=document.getElementById('sinput').value.trim();
+  if(!m){carregarProdutos();return;}
+  document.getElementById('pgrid').innerHTML='<div class="lstate"><div class="spinner"></div><p>Buscando...</p></div>';
+  try{
+    const r = await fetch(EP.marca(m));
+    todos = await r.json();
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.fbtn').classList.add('active');
+    renderizar('');
+  }catch{ toast('Erro ao buscar por marca','error'); }
+}
+function limparBusca(){ document.getElementById('sinput').value=''; carregarProdutos(); }
+
+// ---- RENDERIZAR GRID ----
+function renderizar(f){
+  filtroAtivo=f;
+  const lista = f ? todos.filter(p=>(p.categoria||'').toLowerCase()===f.toLowerCase()) : todos;
+  if(!lista.length){
+    document.getElementById('pgrid').innerHTML='<div class="estate"><span class="eicon">📦</span><p style="font-weight:700">Nenhum produto encontrado</p><p style="font-size:.85rem;margin-top:6px">Cadastre um novo produto acima</p></div>';
+    return;
+  }
+  document.getElementById('pgrid').innerHTML=lista.map(p=>{
+    const emoji=EMOJI[p.categoria]||'📦';
+    const cor=COR[p.categoria]||'#F5F5F5';
+    const img=IMG[p.categoria]||'';
+    const pf='R$ '+(p.preco||0).toFixed(2).replace('.',',');
+    let bc,bl,qc;
+    if(p.quantidade>10){bc='bok';bl='Em estoque';qc='qok';}
+    else if(p.quantidade>0){bc='bbaixo';bl='Estoque baixo';qc='qbaixo';}
+    else{bc='bzero';bl='Sem estoque';qc='qzero';}
+    const pj=JSON.stringify(p).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return `<div class="pcard">
+      <div class="pimg" style="background:${cor}">
+        ${img?`<img src="${img}" alt="${p.categoria||''}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='block'">`:``}
+        <div class="pemoji" ${img?'style="display:none"':''}>${emoji}</div>
+        <span class="pbadge ${bc}">${bl}</span>
+      </div>
+      <div class="pinfo">
+        <div class="pcat">${p.categoria||'Sem categoria'}</div>
+        <div class="pname">${p.nomeProduto||'—'}</div>
+        <div class="pmarca">🏷️ ${p.marca||''}</div>
+        <div class="pmeta">
+          <div class="pprice">${pf}</div>
+          <div class="pqty ${qc}">${p.quantidade} un.</div>
+        </div>
+      </div>
+      <div class="pactions">
+        <button class="bedit" onclick='editarProduto(${pj})'>✏️ Editar</button>
+        <button class="bdel" onclick="confirmarDel(${p.id},'${(p.nomeProduto||'').replace(/'/g,"\\'")}')">🗑️ Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- STATS ----
+function atualizarStats(){
+  document.getElementById('st-total').textContent=todos.length;
+  const v=todos.reduce((s,p)=>s+(p.preco||0)*(p.quantidade||0),0);
+  document.getElementById('st-valor').textContent='R$ '+v.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  document.getElementById('st-baixo').textContent=todos.filter(p=>p.quantidade<=10&&p.quantidade>0).length;
+  document.getElementById('st-cats').textContent=new Set(todos.map(p=>p.categoria).filter(Boolean)).size;
+}
+
+// ---- FILTROS ----
+function filtrar(btn,cat){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sinput').value='';
+  renderizar(cat);
+}
+
+// ---- MODAL ----
+function abrirModal(){
+  modoEdit=false;
+  document.getElementById('mtitle').textContent='➕ Novo Produto';
+  document.getElementById('eid').value='';
+  ['fnome','fmarca','fpreco','fqtd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fcat').value='';
+  document.getElementById('moverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('fnome').focus(),100);
+}
+function fecharModal(){ document.getElementById('moverlay').classList.remove('open'); }
+
+function editarProduto(p){
+  modoEdit=true;
+  document.getElementById('mtitle').textContent='✏️ Editar Produto';
+  document.getElementById('eid').value=p.id;
+  document.getElementById('fnome').value=p.nomeProduto||'';
+  document.getElementById('fmarca').value=p.marca||'';
+  document.getElementById('fcat').value=p.categoria||'';
+  document.getElementById('fpreco').value=p.preco||'';
+  document.getElementById('fqtd').value=p.quantidade||'';
+  document.getElementById('moverlay').classList.add('open');
+}
+
+// ---- POST /papelaria/cadastrarproduto  |  PUT /papelaria ----
+async function salvar(){
+  const nome=document.getElementById('fnome').value.trim();
+  const marca=document.getElementById('fmarca').value.trim();
+  const categoria=document.getElementById('fcat').value;
+  const preco=parseFloat(document.getElementById('fpreco').value);
+  const quantidade=parseInt(document.getElementById('fqtd').value);
+
+  if(!nome||!marca||!categoria||isNaN(preco)||isNaN(quantidade)){
+    toast('Preencha todos os campos!','error'); return;
+  }
+
+  const btn=document.getElementById('msave');
+  btn.textContent='⏳ Salvando...'; btn.disabled=true;
+
+  try{
+    if(modoEdit){
+      // PUT /papelaria — envia id + campos (DadosAtualizarProduto)
+      const id=parseInt(document.getElementById('eid').value);
+      await fetch(EP.atualizar,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({id,nomeProduto:nome,marca,categoria,preco,quantidade})
+      });
+      toast('✅ Produto atualizado com sucesso!','success');
+    }else{
+      // POST /papelaria/cadastrarproduto — sem id (DadosCadastroProduto)
+      await fetch(EP.cadastrar,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({nomeProduto:nome,marca,categoria,preco,quantidade})
+      });
+      toast('✅ Produto cadastrado com sucesso!','success');
+    }
+    fecharModal();
+    carregarProdutos();
+  }catch{
+    toast('❌ Erro ao salvar. Verifique se a API está rodando.','error');
+  }finally{
+    btn.textContent='💾 Salvar no Banco'; btn.disabled=false;
+  }
+}
+
+// ---- DELETE /papelaria/{id} ----
+function fecharConf(){ document.getElementById('coverlay').classList.remove('open'); }
+
+function confirmarDel(id, nome){
+
+  if(!confirm(`Excluir "${nome}"? Esta ação não pode ser desfeita.`)) return;
+
+  fetch(`http://localhost:8080/papelaria/${id}`, { method:'DELETE' })
+
+    .then(r => {
+
+      if(r.ok){
+
+        toast('🗑️ Produto excluído!','success');
+
+        carregarProdutos();
+
+      } else {
+
+        toast('❌ Erro ao excluir','error');
+
+      }
+
+    })
+
+    .catch(() => toast('❌ Erro ao excluir','error'));
+
+}
+
+async function executarDel(){ fecharConf(); }
+ 
+
+// ---- TOAST ----
+let tt;
+function toast(msg,tipo='info'){
+  clearTimeout(tt);
+  const t=document.getElementById('toast');
+  document.getElementById('tmsg').textContent=msg;
+  t.className=`toast show ${tipo}`;
+  tt=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharModal();fecharConf();}});
+
+// ---- INIT ----
+checarApi();
+carregarProdutos();
+</script>
+</body>
+</html>
