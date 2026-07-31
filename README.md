@@ -1,6 +1,4 @@
-=======================================================
   PintaVida Papelaria — Sistema de Estoque Interno
-=======================================================
 
 Sistema de gerenciamento de estoque para uma papelaria desenvolvido em equipe.
 
